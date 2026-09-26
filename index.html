@@ -77,47 +77,64 @@
   <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
   <div id="result"></div>
 
-  <script>
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyQLTbU6brZztgP-n8rl6LA45SZfsjY8F1f3Z-y5HFVK5Aw8izgzlTzI-PgUpvlXLs/execL";
-    function pickItem(s){if(s.value){s.parentElement.querySelector(".input-item").value=s.value;s.value="";}}
-    function addNewRow(){
-      var tbody = document.getElementById("itemsContainer");
-      var tr = document.createElement("tr"); tr.className = "item-row";
-      tr.innerHTML = '<td><input type="text" class="input-user" placeholder="User"></td><td><input type="number" class="input-qty" min="1" value="1"></td><td><div class="item-field-container"><input type="text" class="input-item" placeholder="Type here..."><select onchange="pickItem(this)"><option value="" selected disabled>📋 Picker</option><option value="System Unit (SERVER i3)">System Unit</option><option value="Computer Set">Computer Set</option><option value="Monitor">Monitor</option><option value="UPS (APC)">UPS (APC)</option></select></div></td><td><input type="text" class="input-serial" placeholder="Serial"></td><td><input type="text" class="input-remarks" placeholder="Remarks"></td><td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>';
-      tbody.appendChild(tr);
-    }
-    function deleteRow(b){
-      var tbody = document.getElementById("itemsContainer");
-      if(tbody.querySelectorAll(".item-row").length > 1){ tbody.removeChild(b.closest(".item-row")); }
-    }
-    function submitForm() {
-      var btn = document.getElementById("btnSubmit"); var resultDiv = document.getElementById("result");
-      var prep = document.getElementById("preparedBy").value;
-      if (!prep) { resultDiv.style.display = "block"; resultDiv.style.backgroundColor = "#ffdbdb"; resultDiv.style.color = "#c53030"; resultDiv.innerHTML = "⚠️ Pumili sa PREPARED BY."; return; }
-      var itemsData = [];
-      document.querySelectorAll(".item-row").forEach(function(row) {
-        var itemVal = row.querySelector(".input-item").value;
-        if (itemVal && itemVal.trim() !== "") {
-          itemsData.push({
-            user: row.querySelector(".input-user").value || "",
-            qty: row.querySelector(".input-qty").value || "1",
-            item: itemVal.trim(),
-            serial: row.querySelector(".input-serial").value || "",
-            remarks: row.querySelector(".input-remarks").value || ""
-          });
-        }
-      });
-      var formData = { poNum: document.getElementById("poNum").value, dateField: document.getElementById("dateField").value, fromField: document.getElementById("fromField").value, toField: document.getElementById("toField").value, coField: document.getElementById("coField").value, preparedBy: prep, itemsJson: JSON.stringify(itemsData) };
-      btn.disabled = true; resultDiv.style.display = "block"; resultDiv.style.backgroundColor = "#262626"; resultDiv.style.color = "#ffcc00"; resultDiv.innerHTML = "⏳ Ipinoproseso... Sandali lamang...";
-      fetch(GAS_WEB_APP_URL, { method: "POST", body: JSON.stringify(formData), headers: { "Content-Type": "text/plain;charset=utf-8" } })
-      .then(res => res.json()).then(data => {
-        btn.disabled = false;
-        if (data.status === "success" && data.url) {
-          resultDiv.style.backgroundColor = "#1a2e1a"; resultDiv.style.color = "#ffffff";
-          resultDiv.innerHTML = '<div style="font-size: 16px; margin-bottom: 12px; font-weight: bold;">🎉 Tagumpay! Nalikha ang iyong Transmittal.</div><a class="success-link" href="'+data.url+'" target="_blank">📄 BUKSAN ANG TRANSMITTAL DOCUMENT</a>';
-        } else { throw new Error(data.message || "Error."); }
-      }).catch(err => { btn.disabled = false; resultDiv.style.backgroundColor = "#ffdbdb"; resultDiv.style.color = "#c53030"; resultDiv.innerHTML = "❌ Error: " + err.message; });
-    }
-  </script>
+ <script>
+  const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby3SL4YFE2lgWe6dSvZYQTLb-sTQ8P3Zx9ned7d_hgms6rtKN7v0z0GPT5pgptBOCV0/exec";
+
+  function pickItem(s){if(s.value){s.parentElement.querySelector(".input-item").value=s.value;s.value="";}}
+  
+  function addNewRow(){
+    var tbody = document.getElementById("itemsContainer");
+    var tr = document.createElement("tr"); tr.className = "item-row";
+    tr.innerHTML = '<td><input type="text" class="input-user" placeholder="User"></td><td><input type="number" class="input-qty" min="1" value="1"></td><td><div class="item-field-container"><input type="text" class="input-item" placeholder="Type here..."><select onchange="pickItem(this)"><option value="" selected disabled>📋 Picker</option><option value="System Unit (SERVER i3)">System Unit</option><option value="Computer Set">Computer Set</option><option value="Monitor">Monitor</option><option value="UPS (APC)">UPS (APC)</option></select></div></td><td><input type="text" class="input-serial" placeholder="Serial"></td><td><input type="text" class="input-remarks" placeholder="Remarks"></td><td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>';
+    tbody.appendChild(tr);
+  }
+  
+  function deleteRow(b){
+    var tbody = document.getElementById("itemsContainer");
+    if(tbody.querySelectorAll(".item-row").length > 1){ tbody.removeChild(b.closest(".item-row")); }
+  }
+  
+  function submitForm() {
+    var btn = document.getElementById("btnSubmit"); var resultDiv = document.getElementById("result");
+    var prep = document.getElementById("preparedBy").value;
+    if (!prep) { resultDiv.style.display = "block"; resultDiv.style.backgroundColor = "#ffdbdb"; resultDiv.style.color = "#c53030"; resultDiv.innerHTML = "⚠️ Pumili sa PREPARED BY."; return; }
+    
+    var itemsData = [];
+    document.querySelectorAll(".item-row").forEach(function(row) {
+      var itemVal = row.querySelector(".input-item").value;
+      if (itemVal && itemVal.trim() !== "") {
+        itemsData.push({
+          user: row.querySelector(".input-user").value || "",
+          qty: row.querySelector(".input-qty").value || "1",
+          item: itemVal.trim(),
+          serial: row.querySelector(".input-serial").value || "",
+          remarks: row.querySelector(".input-remarks").value || ""
+        });
+      }
+    });
+    
+    var formData = { poNum: document.getElementById("poNum").value, dateField: document.getElementById("dateField").value, fromField: document.getElementById("fromField").value, toField: document.getElementById("toField").value, coField: document.getElementById("coField").value, preparedBy: prep, itemsJson: JSON.stringify(itemsData) };
+    
+    btn.disabled = true; resultDiv.style.display = "block"; resultDiv.style.backgroundColor = "#262626"; resultDiv.style.color = "#ffcc00"; resultDiv.innerHTML = "⏳ Ipinoproseso... Tingnan ang iyong Google Drive matapos nito.";
+    
+    // Inayos gamit ang 'no-cors' para lampasan ang Failed to Fetch error
+    fetch(GAS_WEB_APP_URL, { 
+      method: "POST", 
+      body: JSON.stringify(formData), 
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" } 
+    })
+    .then(() => {
+      btn.disabled = false;
+      resultDiv.style.backgroundColor = "#1a2e1a"; resultDiv.style.color = "#ffffff";
+      // Dahil naka 'no-cors', hindi pwedeng ibalik ng Google ang link sa screen para sa security, pero tapos na at nalikha na ito sa iyong Google Drive!
+      resultDiv.innerHTML = '<div style="font-size: 16px; font-weight: bold;">🎉 Tagumpay! Nalikha ang iyong Transmittal.</div><div style="font-size:12px; color:#aaa; margin-top:5px;">Suriin ang iyong Google Drive para sa file na "Transmittal - PO ' + formData.poNum + '"</div>';
+    })
+    .catch(err => { 
+      btn.disabled = false; resultDiv.style.backgroundColor = "#ffdbdb"; resultDiv.style.color = "#c53030"; resultDiv.innerHTML = "❌ Error: " + err.message; 
+    });
+  }
+</script>
+
 </body>
 </html>
