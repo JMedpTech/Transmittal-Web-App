@@ -123,6 +123,9 @@
         var clone = baseRow.cloneNode(true);
         clone.removeAttribute("id");
         
+        // Tiyaking laging may class na 'item-row' ang bagong gawang hilera para mabilang sa loop mamaya
+        clone.className = "item-row";
+        
         var inputs = clone.querySelectorAll("input");
         inputs.forEach(function(input) {
           if (input.className === "input-qty") {
@@ -153,7 +156,7 @@
         }
       }
 
-      // Palitan ang URL link sa loob ng panipi gamit ang iyong Apps Script Web App Deployment URL link
+      // Siguraduhing ito ang Web App URL mula sa iyong Transmittal deployment
       const googleSheetUrl = "https://script.google.com/macros/s/AKfycby2pRm8ZwzumjzWsyUH3pWYsgmBByZJA_gkU1eoZApu6o1j7InoebdJfXh3i8ulBNpimw/exec";
 
       function submitForm() {
@@ -174,6 +177,8 @@
         resultDiv.style.display = "none";
 
         var itemsData = [];
+        
+        // ITINAMA ANG PAGBIBILANG: Binabasa ang lahat ng hilerang may class na 'item-row'
         var rows = document.querySelectorAll(".item-row");
         rows.forEach(function(row) {
           var itemVal = row.querySelector(".input-item").value;
@@ -182,10 +187,3 @@
               user: row.querySelector(".input-user").value.trim(),
               qty: row.querySelector(".input-qty").value || "1",
               item: itemVal.trim(),
-              serial: row.querySelector(".input-serial").value.trim(),
-              remarks: row.querySelector(".input-remarks").value.trim()
-            });
-          }
-        });
-
-        const params = new URLSearchParams();
