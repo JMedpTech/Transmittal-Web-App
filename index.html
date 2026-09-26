@@ -129,7 +129,7 @@
         
         var inputs = clone.querySelectorAll("input");
         inputs.forEach(function(input) {
-          if (input.className === "input-qty") {
+          if (input.classList.contains("input-qty")) {
             input.value = "1";
           } else {
             input.value = "";
@@ -139,6 +139,7 @@
         tbody.appendChild(clone);
       }
 
+      // IDINUGTONG AT ITINAMA ANG NAPUTOL MONG LOGIC DITO
       function deleteRow(button) {
         var row = button.parentNode.parentNode;
         var tbody = document.getElementById("itemsContainer");
@@ -148,7 +149,7 @@
         } else {
           var inputs = row.querySelectorAll("input");
           inputs.forEach(function(input) {
-            if (input.className === "input-qty") {
+            if (input.classList.contains("input-qty")) {
               input.value = "1";
             } else {
               input.value = "";
@@ -157,8 +158,8 @@
         }
       }
 
-      // IPASTE DITO ANG IYONG BAGONG WEB APP URL MULA SA DEPLOYMENT NG SCRIPT MO
-      const googleSheetUrl = "https://google.com";
+      // IPALIT ANG IYONG WEB APP URL MULA SA BAGONG DEPLOYMENT DITO
+      const googleSheetUrl = "https://script.google.com/macros/s/AKfycby2pRm8ZwzumjzWsyUH3pWYsgmBByZJA_gkU1eoZApu6o1j7InoebdJfXh3i8ulBNpimw/exec";
 
       function submitForm() {
         var btn = document.getElementById("btnSubmit");
@@ -184,4 +185,3 @@
           if (itemVal && itemVal.trim() !== "") {
             itemsData.push({
               user: row.querySelector(".input-user").value.trim(),
-              qty: row.querySelector(".input-qty").value || "1",
