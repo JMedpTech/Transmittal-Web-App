@@ -24,9 +24,8 @@
       .btn-submit { width: 100%; background-color: #ffcc00; color: #121212; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 25px; }
       .btn-submit:hover { background-color: #e6b800; }
       
-      /* Result Styles */
       #result { margin-top: 20px; padding: 20px; border-radius: 6px; display: none; text-align: center; font-weight: bold; font-size: 16px; }
-      .success-link { background-color: #24292e; color: #ffcc00; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 15px; font-size: 15px; border: 2px solid #ffcc00; transition: 0.3s; }
+      .success-link { background-color: #24292e; color: #ffcc00; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 15px; font-size: 15px; border: 2px solid #ffcc00; transition: 0.3s; text-align: center; }
       .success-link:hover { background-color: #ffcc00; color: #121212; }
       
       .btn-delete { background-color: #e53e3e; color: white; border: none; padding: 6px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; display: block; margin: 0 auto; }
@@ -97,8 +96,8 @@
     <div id="result"></div>
 
     <script>
-      // ⚠️ IMPORTANT: I-PASTE DITO ANG CURRENT WEB APP URL NA GALING SA IYONG APPS SCRIPT DEPLOYMENT
-      const APPS_SCRIPT_URL = "https://google.com";
+      // ⚠️ IMPORTANT: I-PASTE DITO ANG IYONG CURRENT APPS SCRIPT WEB APP URL
+      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7aqMaaCZ_IZgOB8rWIX_9SDFWpdI-qYVdoP9SU11_RJ3GwGttt8xBica00LAu9Qsp/exec";
 
       function pickItem(selectObj) {
         if (selectObj.value) {
@@ -138,6 +137,31 @@
         }
       }
 
+      // Ito ang tagasalo ng sagot mula sa Google Apps Script background processing
+      window.handleGoogleResponse = function(data) {
+        var btn = document.getElementById("btnSubmit");
+        var resultDiv = document.getElementById("result");
+        
+        btn.disabled = false;
+        btn.innerHTML = "GUMAWA AT I-GENERATE ANG TRANSMITTAL";
+        
+        if (data && data.success) {
+          resultDiv.style.backgroundColor = "#d4edda";
+          resultDiv.style.color = "#155724";
+          resultDiv.innerHTML = 
+            '🎉 Tagumpay! Nalikha ang iyong Transmittal.<br>' +
+            '<a class="success-link" href="' + data.url + '" target="_blank">📄 BUKSAN ANG TRANSMITTAL DOCUMENT</a>';
+        } else {
+          resultDiv.style.backgroundColor = "#ffdbdb";
+          resultDiv.style.color = "#c53030";
+          resultDiv.innerHTML = "❌ Error: " + (data.error || "Hindi nalikha ang file.");
+        }
+        
+        // Linisin ang temporary tag sa background
+        var oldScript = document.getElementById("jsonp_helper");
+        if(oldScript) oldScript.parentNode.removeChild(oldScript);
+      };
+
       function submitForm() {
         var btn = document.getElementById("btnSubmit");
         var resultDiv = document.getElementById("result");
@@ -157,26 +181,3 @@
           var itemVal = row.querySelector(".input-item").value;
           if (itemVal && itemVal.trim() !== "") {
             itemsData.push({
-              user: row.querySelector(".input-user").value || "",
-              qty: row.querySelector(".input-qty").value || "1",
-              item: itemVal.trim(),
-              serial: row.querySelector(".input-serial").value || "",
-              remarks: row.querySelector(".input-remarks").value || ""
-            });
-          }
-        });
-
-        // Baguhin ang status ng button at lagyan ng iyong orihinal na loading indicator text
-        btn.disabled = true;
-        btn.innerHTML = "⏳ NAGPAPROSESO...";
-        resultDiv.style.display = "block";
-        resultDiv.style.backgroundColor = "#fff3cd";
-        resultDiv.style.color = "#856404";
-        resultDiv.innerHTML = "⏳ Ipinapadala ang transmittal data... Nagbubukas ng bagong window para sa Google Docs Link.";
-
-        // Pag-setup ng data payload para sa URL parameters
-        var queryParams = new URLSearchParams({
-          poNum: document.getElementById("poNum").value,
-          dateField: document.getElementById("dateField").value,
-          fromField: document.getElementById("fromField").value,
-          toField: document.getElementById("toField").value,
