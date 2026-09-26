@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <base target="_top">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LRCI Transmittal Web App</title>
     <style>
       body { font-family: Arial, sans-serif; padding: 25px; background-color: #121212; color: #e0e0e0; max-width: 950px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-radius: 8px; margin-top: 30px; background: #1a1a1a; }
@@ -91,12 +92,12 @@
     </table>
     
     <button type="button" class="btn-add" onclick="addNewRow()">➕ ADD ROW</button>
-    <button id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
+    <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
     
     <div id="result"></div>
 
     <script>
-      // ⚠️ PALITAN MO ITO NG IYONG LIVE GOOGLE APPS SCRIPT WEB APP URL Matapos mag Deploy bilang Anyone!
+      // ⚠️ IPALIT ANG IYONG LIVE GOOGLE APPS SCRIPT WEB APP URL DITO (DAPAT NAGSISISIMULA SA https://google.com...)
       const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwptAnL-vnBd0w3AmzC1bZHlA9TESgE80tPuOYa8KMvw9NJHqsX1ULXdtDsDv3Miqk8/exec";
 
       function pickItem(selectObj) {
@@ -120,13 +121,12 @@
             input.value = "";
           }
         });
-        
         tbody.appendChild(clone);
       }
 
       function deleteRow(button) {
-        var row = button.parentNode.parentNode;
         var tbody = document.getElementById("itemsContainer");
+        var row = button.closest(".item-row");
         
         if (tbody.querySelectorAll(".item-row").length > 1) {
           tbody.removeChild(row);
@@ -184,6 +184,3 @@
         resultDiv.style.display = "block";
         resultDiv.style.backgroundColor = "#262626";
         resultDiv.style.color = "#ffcc00";
-        resultDiv.innerHTML = "⏳ Ipinoproseso at ginagawa ang transmittal document. Sandali lamang...";
-
-        // Pag-post ng Data sa Google Apps Script sa pamamagitan ng Redirect handling
