@@ -15,6 +15,7 @@
       input[type="text"], input[type="date"], input[type="number"], select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #444; border-radius: 4px; font-size: 13px; background-color: #2b2b2b; color: #ffffff; }
       input:focus, select:focus { border-color: #ffcc00; outline: none; box-shadow: 0 0 0 3px rgba(255,204,0,0.2); }
       
+      /* Responsive container para sa table sa Mobile */
       .table-container { width: 100%; overflow-x: auto; margin-top: 10px; }
       table { width: 100%; border-collapse: collapse; min-width: 750px; }
       th { background-color: #ffcc00; color: #121212; padding: 10px; font-size: 12px; border: 1px solid #ffcc00; }
@@ -27,6 +28,7 @@
       .btn-add:hover { background-color: #e6b800; }
       .btn-submit { width: 100%; background-color: #ffcc00; color: #121212; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 25px; }
       .btn-submit:hover { background-color: #e6b800; }
+      .btn-submit:disabled { background-color: #555; color: #aaa; cursor: not-allowed; }
       
       #result { margin-top: 20px; padding: 15px; border-radius: 4px; display: none; text-align: center; font-weight: bold; }
       .success-link { background-color: #2f855a; color: white; padding: 12px; display: block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 10px; font-size: 14px; border: 1px solid #276749; }
@@ -106,6 +108,7 @@
     <div id="result"></div>
 
     <script>
+      // Naayos na ang split para mag-load ang date box at hindi mag-crash ang mga button
       window.onload = function() {
           document.getElementById('dateField').value = new Date().toISOString().split('T')[0];
       };
@@ -122,13 +125,11 @@
         var baseRow = document.getElementById("defaultRow");
         var clone = baseRow.cloneNode(true);
         clone.removeAttribute("id");
-        
-        // Tiyaking laging may class na 'item-row' ang bagong gawang hilera para mabilang sa loop mamaya
         clone.className = "item-row";
         
         var inputs = clone.querySelectorAll("input");
         inputs.forEach(function(input) {
-          if (input.className === "input-qty") {
+          if (input.classList.contains("input-qty")) {
             input.value = "1";
           } else {
             input.value = "";
@@ -147,7 +148,7 @@
         } else {
           var inputs = row.querySelectorAll("input");
           inputs.forEach(function(input) {
-            if (input.className === "input-qty") {
+            if (input.classList.contains("input-qty")) {
               input.value = "1";
             } else {
               input.value = "";
@@ -156,7 +157,7 @@
         }
       }
 
-      // Siguraduhing ito ang Web App URL mula sa iyong Transmittal deployment
+      // 📍 IPASTE MO ANG IYONG KINOPYANG WEB APP URL SA LOOB NG PANIPI SA IBABA:
       const googleSheetUrl = "https://script.google.com/macros/s/AKfycby2pRm8ZwzumjzWsyUH3pWYsgmBByZJA_gkU1eoZApu6o1j7InoebdJfXh3i8ulBNpimw/exec";
 
       function submitForm() {
@@ -177,8 +178,6 @@
         resultDiv.style.display = "none";
 
         var itemsData = [];
-        
-        // ITINAMA ANG PAGBIBILANG: Binabasa ang lahat ng hilerang may class na 'item-row'
         var rows = document.querySelectorAll(".item-row");
         rows.forEach(function(row) {
           var itemVal = row.querySelector(".input-item").value;
@@ -187,3 +186,4 @@
               user: row.querySelector(".input-user").value.trim(),
               qty: row.querySelector(".input-qty").value || "1",
               item: itemVal.trim(),
+              serial: row.querySelector(".input-serial").value.trim(),
