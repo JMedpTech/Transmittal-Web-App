@@ -37,76 +37,68 @@
     <h3>LRCI – MEYCAUYAN BRANCH (EDP)</h3>
     <div style="text-align: center; color: #aaa; margin-top: -5px; margin-bottom: 20px; font-size: 14px; letter-spacing: 1px;">Transmittal Portal</div>
     
-    <!-- Itinutok ang target sa invisible iframe para HINDI magbukas ng bagong tab o mag-refresh ang screen -->
-    <form id="transmittalForm" action="" method="GET" target="hidden_iframe">
-      <div class="meta-section">
-        <div class="form-group"><label>PO NUMBER:</label><input type="text" name="poNum" id="poNum" placeholder="PO#"></div>
-        <div class="form-group"><label>DATE (Transmittal Created):</label><input type="date" name="dateField" id="dateField"></div>
-        <div class="form-group"><label>FROM:</label><input type="text" name="fromField" id="fromField" placeholder="FROM"></div>
-        <div class="form-group"><label>TO:</label><input type="text" name="toField" id="toField" placeholder="TO"></div>
-        <div class="form-group"><label>C/O:</label><input type="text" name="coField" id="coField" placeholder="C/O"></div>
-        <div class="form-group"><label>PREPARED BY:</label>
-          <select name="preparedBy" id="preparedBy" required>
-            <option value="" selected disabled>-- SELECT NAME --</option>
-            <option value="JM EDP MEYCAUYAN">JM EDP MEYCAUYAN</option>
-            <option value="RAFFY EDP MEYCAUYAN">RAFFY EDP MEYCAUYAN</option>
-          </select>
-        </div>
+    <div class="meta-section">
+      <div class="form-group"><label>PO NUMBER:</label><input type="text" id="poNum" placeholder="PO#"></div>
+      <div class="form-group"><label>DATE (Transmittal Created):</label><input type="date" id="dateField"></div>
+      <div class="form-group"><label>FROM:</label><input type="text" id="fromField" placeholder="FROM"></div>
+      <div class="form-group"><label>TO:</label><input type="text" id="toField" placeholder="TO"></div>
+      <div class="form-group"><label>C/O:</label><input type="text" id="coField" placeholder="C/O"></div>
+      <div class="form-group"><label>PREPARED BY:</label>
+        <select id="preparedBy" required>
+          <option value="" selected disabled>-- SELECT NAME --</option>
+          <option value="JM EDP MEYCAUYAN">JM EDP MEYCAUYAN</option>
+          <option value="RAFFY EDP MEYCAUYAN">RAFFY EDP MEYCAUYAN</option>
+        </select>
       </div>
+    </div>
 
-      <input type="hidden" name="itemsJson" id="itemsJson">
-
-      <div class="item-title">📋 LISTAHAN NG MGA ITEMS / GAMIT</div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 20%;">USER</th>
-            <th style="width: 10%;">QTY</th>
-            <th style="width: 35%;">ITEM NAME (Type or Use Picker) *</th>
-            <th style="width: 17%;">SERIAL</th>
-            <th style="width: 13%;">REMARKS</th>
-            <th style="width: 5%;"></th>
-          </tr>
-        </thead>
-        <tbody id="itemsContainer">
-          <tr class="item-row" id="defaultRow">
-            <td><input type="text" class="input-user" placeholder="User"></td>
-            <td><input type="number" class="input-qty" value="1" min="1"></td>
-            <td>
-              <div class="item-field-container">
-                <input type="text" class="input-item" placeholder="Type here...">
-                <select onchange="pickItem(this)">
-                  <option value="" selected disabled>📋 Picker</option>
-                  <option value="System Unit (SERVER i3)">System Unit (SERVER i3)</option>
-                  <option value="Computer Set (System unit (Station), Monitor, Keyboard & Mouse, Avr)">Computer Set</option>
-                  <option value="System Unit (Station)">System Unit (Station)</option>
-                  <option value="Monitor">Monitor</option>
-                  <option value="UPS (APC)">UPS (APC)</option>
-                  <option value="Webcam Inplay">Webcam Inplay</option>
-                  <option value="Switch Hub Tplink 8 Ports">Switch Hub Tplink 8 Ports</option>
-                  <option value="Printer Epson L21">Printer Epson L21</option>
-                </select>
-              </div>
-            </td>
-            <td><input type="text" class="input-serial" placeholder="Serial No."></td>
-            <td><input type="text" class="input-remarks" placeholder="Remarks"></td>
-            <td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <button type="button" class="btn-add" onclick="addNewRow()">➕ ADD ROW</button>
-      <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
-    </form>
+    <div class="item-title">📋 LISTAHAN NG MGA ITEMS / GAMIT</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 20%;">USER</th>
+          <th style="width: 10%;">QTY</th>
+          <th style="width: 35%;">ITEM NAME (Type or Use Picker) *</th>
+          <th style="width: 17%;">SERIAL</th>
+          <th style="width: 13%;">REMARKS</th>
+          <th style="width: 5%;"></th>
+        </tr>
+      </thead>
+      <tbody id="itemsContainer">
+        <tr class="item-row" id="defaultRow">
+          <td><input type="text" class="input-user" placeholder="User"></td>
+          <td><input type="number" class="input-qty" value="1" min="1"></td>
+          <td>
+            <div class="item-field-container">
+              <input type="text" class="input-item" placeholder="Type here...">
+              <select onchange="pickItem(this)">
+                <option value="" selected disabled>📋 Picker</option>
+                <option value="System Unit (SERVER i3)">System Unit (SERVER i3)</option>
+                <option value="Computer Set (System unit (Station), Monitor, Keyboard & Mouse, Avr)">Computer Set</option>
+                <option value="System Unit (Station)">System Unit (Station)</option>
+                <option value="Monitor">Monitor</option>
+                <option value="UPS (APC)">UPS (APC)</option>
+                <option value="Webcam Inplay">Webcam Inplay</option>
+                <option value="Switch Hub Tplink 8 Ports">Switch Hub Tplink 8 Ports</option>
+                <option value="Printer Epson L21">Printer Epson L21</option>
+              </select>
+            </div>
+          </td>
+          <td><input type="text" class="input-serial" placeholder="Serial No."></td>
+          <td><input type="text" class="input-remarks" placeholder="Remarks"></td>
+          <td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <button type="button" class="btn-add" onclick="addNewRow()">➕ ADD ROW</button>
+    <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
     
     <div id="result"></div>
 
-    <!-- Invisible Iframe: Dito papasok nang tahimik ang request nang walang ibang tab na bumubukas -->
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-
     <script>
-      // ⚠️ IMPORTANT: I-PASTE DITO ANG IYONG APPS SCRIPT WEB APP URL
-      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvywbxhjITvLbyTzj66iz1619GEqv4zH-5upCjKoohUivBTL2W5pql-ORUevE6oB5t/exec";
+      // ⚠️ IMPORTANT: I-PASTE DITO ANG CURRENT WEB APP URL NA GALING SA IYONG APPS SCRIPT DEPLOYMENT
+      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxi4Y86QfByH2o5EvWLPIeD_E8o7ADRC_itTyVYXIoiBCWLnpQEmZsdTW6bRDbISB4F/exec";
 
       function pickItem(selectObj) {
         if (selectObj.value) {
@@ -147,7 +139,6 @@
       }
 
       function submitForm() {
-        var form = document.getElementById("transmittalForm");
         var btn = document.getElementById("btnSubmit");
         var resultDiv = document.getElementById("result");
         var preparedByVal = document.getElementById("preparedBy").value;
@@ -175,5 +166,17 @@
           }
         });
 
-        document.getElementById("itemsJson").value = JSON.stringify(itemsData);
+        // Baguhin ang status ng button at lagyan ng iyong orihinal na loading indicator text
+        btn.disabled = true;
+        btn.innerHTML = "⏳ NAGPAPROSESO...";
+        resultDiv.style.display = "block";
+        resultDiv.style.backgroundColor = "#fff3cd";
+        resultDiv.style.color = "#856404";
+        resultDiv.innerHTML = "⏳ Ipinapadala ang transmittal data... Nagbubukas ng bagong window para sa Google Docs Link.";
 
+        // Pag-setup ng data payload para sa URL parameters
+        var queryParams = new URLSearchParams({
+          poNum: document.getElementById("poNum").value,
+          dateField: document.getElementById("dateField").value,
+          fromField: document.getElementById("fromField").value,
+          toField: document.getElementById("toField").value,
