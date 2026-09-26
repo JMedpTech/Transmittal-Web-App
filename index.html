@@ -2,7 +2,6 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LRCI Transmittal Portal</title>
     <style>
       body { font-family: Arial, sans-serif; padding: 25px; background-color: #121212; color: #e0e0e0; max-width: 950px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-radius: 8px; margin-top: 30px; background: #1a1a1a; }
@@ -23,11 +22,8 @@
       .btn-add:hover { background-color: #e6b800; }
       .btn-submit { width: 100%; background-color: #ffcc00; color: #121212; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 25px; }
       .btn-submit:hover { background-color: #e6b800; }
-      
       #result { margin-top: 20px; padding: 20px; border-radius: 6px; display: none; text-align: center; font-weight: bold; font-size: 16px; }
-      .success-link { background-color: #24292e; color: #ffcc00; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 15px; font-size: 15px; border: 2px solid #ffcc00; transition: 0.3s; text-align: center; }
-      .success-link:hover { background-color: #ffcc00; color: #121212; }
-      
+      .success-link { background-color: #24292e; color: #ffcc00; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 15px; font-size: 15px; border: 2px solid #ffcc00; }
       .btn-delete { background-color: #e53e3e; color: white; border: none; padding: 6px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; display: block; margin: 0 auto; }
       .btn-delete:hover { background-color: #c53030; }
     </style>
@@ -43,7 +39,7 @@
       <div class="form-group"><label>TO:</label><input type="text" id="toField" placeholder="TO"></div>
       <div class="form-group"><label>C/O:</label><input type="text" id="coField" placeholder="C/O"></div>
       <div class="form-group"><label>PREPARED BY:</label>
-        <select id="preparedBy" required>
+        <select id="preparedBy">
           <option value="" selected disabled>-- SELECT NAME --</option>
           <option value="JM EDP MEYCAUYAN">JM EDP MEYCAUYAN</option>
           <option value="RAFFY EDP MEYCAUYAN">RAFFY EDP MEYCAUYAN</option>
@@ -66,7 +62,7 @@
       <tbody id="itemsContainer">
         <tr class="item-row" id="defaultRow">
           <td><input type="text" class="input-user" placeholder="User"></td>
-          <td><input type="number" class="input-qty" value="1" min="1"></td>
+          <td><input type="number" class="input-qty" placeholder="1" min="1"></td>
           <td>
             <div class="item-field-container">
               <input type="text" class="input-item" placeholder="Type here...">
@@ -96,13 +92,13 @@
     <div id="result"></div>
 
     <script>
-      // ⚠️ IMPORTANT: I-PASTE DITO ANG IYONG CURRENT APPS SCRIPT WEB APP URL
-      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7aqMaaCZ_IZgOB8rWIX_9SDFWpdI-qYVdoP9SU11_RJ3GwGttt8xBica00LAu9Qsp/exec";
+      // ⚠️ IMPORTANT: I-PASTE DITO ANG IYONG APPS SCRIPT WEB APP URL
+      var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7aqMaaCZ_IZgOB8rWIX_9SDFWpdI-qYVdoP9SU11_RJ3GwGttt8xBica00LAu9Qsp/exec";
 
+      // BALIK SA ORIHINAL MONG MGA FUNCTIONS (100% GAGANA ANG ADD ROW AT PICKER)
       function pickItem(selectObj) {
         if (selectObj.value) {
-          var container = selectObj.closest(".item-field-container") || selectObj.parentElement;
-          container.querySelector(".input-item").value = selectObj.value;
+          selectObj.parentElement.querySelector(".input-item").value = selectObj.value;
           selectObj.value = ""; 
         }
       }
@@ -110,58 +106,32 @@
       function addNewRow() {
         var tbody = document.getElementById("itemsContainer");
         var baseRow = document.getElementById("defaultRow");
-        if (!baseRow) return;
-        
         var clone = baseRow.cloneNode(true);
         clone.removeAttribute("id");
         
         var inputs = clone.querySelectorAll("input");
         inputs.forEach(function(input) {
-          if (input.classList.contains("input-qty")) {
-            input.value = "1";
-          } else {
-            input.value = "";
-          }
+          input.value = "";
         });
+        
         tbody.appendChild(clone);
       }
 
       function deleteRow(button) {
-        var row = button.closest("tr") || button.parentNode.parentNode;
+        var row = button.parentNode.parentNode;
         var tbody = document.getElementById("itemsContainer");
+        
         if (tbody.rows.length > 1) {
           tbody.removeChild(row);
         } else {
           var inputs = row.querySelectorAll("input");
-          inputs.forEach(function(input) { input.value = ""; });
+          inputs.forEach(function(input) {
+            input.value = "";
+          });
         }
       }
 
-      // Ito ang tagasalo ng sagot mula sa Google Apps Script background processing
-      window.handleGoogleResponse = function(data) {
-        var btn = document.getElementById("btnSubmit");
-        var resultDiv = document.getElementById("result");
-        
-        btn.disabled = false;
-        btn.innerHTML = "GUMAWA AT I-GENERATE ANG TRANSMITTAL";
-        
-        if (data && data.success) {
-          resultDiv.style.backgroundColor = "#d4edda";
-          resultDiv.style.color = "#155724";
-          resultDiv.innerHTML = 
-            '🎉 Tagumpay! Nalikha ang iyong Transmittal.<br>' +
-            '<a class="success-link" href="' + data.url + '" target="_blank">📄 BUKSAN ANG TRANSMITTAL DOCUMENT</a>';
-        } else {
-          resultDiv.style.backgroundColor = "#ffdbdb";
-          resultDiv.style.color = "#c53030";
-          resultDiv.innerHTML = "❌ Error: " + (data.error || "Hindi nalikha ang file.");
-        }
-        
-        // Linisin ang temporary tag sa background
-        var oldScript = document.getElementById("jsonp_helper");
-        if(oldScript) oldScript.parentNode.removeChild(oldScript);
-      };
-
+      // MODERNO AT TAHIMIK NA BACKGROUND GENERATION (WALANG AUTOMATIC NEW WINDOW)
       function submitForm() {
         var btn = document.getElementById("btnSubmit");
         var resultDiv = document.getElementById("result");
@@ -181,3 +151,32 @@
           var itemVal = row.querySelector(".input-item").value;
           if (itemVal && itemVal.trim() !== "") {
             itemsData.push({
+              user: row.querySelector(".input-user").value || "",
+              qty: row.querySelector(".input-qty").value || "1",
+              item: itemVal.trim(),
+              serial: row.querySelector(".input-serial").value || "",
+              remarks: row.querySelector(".input-remarks").value || ""
+            });
+          }
+        });
+
+        btn.disabled = true;
+        btn.innerHTML = "⏳ NAGPAPROSESO...";
+        resultDiv.style.display = "block";
+        resultDiv.style.backgroundColor = "#fff3cd";
+        resultDiv.style.color = "#856404";
+        resultDiv.innerHTML = "⏳ Ipinapadala ang transmittal data... Kasalukuyang nililikha ang iyong file sa Google Drive...";
+
+        var queryParams = new URLSearchParams({
+          poNum: document.getElementById("poNum").value,
+          dateField: document.getElementById("dateField").value,
+          fromField: document.getElementById("fromField").value,
+          toField: document.getElementById("toField").value,
+          coField: document.getElementById("coField").value,
+          preparedBy: preparedByVal,
+          itemsJson: JSON.stringify(itemsData)
+        });
+
+        // FETCH METHOD: Ligtas na tatakbo sa background nang WALANG BINUBUKSANG WINDOW
+        fetch(APPS_SCRIPT_URL + "?" + queryParams.toString(), { 
+          method: "GET",
