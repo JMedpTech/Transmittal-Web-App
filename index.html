@@ -23,7 +23,12 @@
       .btn-add:hover { background-color: #e6b800; }
       .btn-submit { width: 100%; background-color: #ffcc00; color: #121212; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 25px; }
       .btn-submit:hover { background-color: #e6b800; }
-      #result { margin-top: 20px; padding: 15px; border-radius: 4px; display: none; text-align: center; font-weight: bold; }
+      
+      /* Result Styles */
+      #result { margin-top: 20px; padding: 20px; border-radius: 6px; display: none; text-align: center; font-weight: bold; font-size: 16px; }
+      .success-link { background-color: #24292e; color: #ffcc00; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 15px; font-size: 15px; border: 2px solid #ffcc00; transition: 0.3s; }
+      .success-link:hover { background-color: #ffcc00; color: #121212; }
+      
       .btn-delete { background-color: #e53e3e; color: white; border: none; padding: 6px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; display: block; margin: 0 auto; }
       .btn-delete:hover { background-color: #c53030; }
     </style>
@@ -32,74 +37,68 @@
     <h3>LRCI – MEYCAUYAN BRANCH (EDP)</h3>
     <div style="text-align: center; color: #aaa; margin-top: -5px; margin-bottom: 20px; font-size: 14px; letter-spacing: 1px;">Transmittal Portal</div>
     
-    <!-- Ginamitan ng totoong HTML Form para i-bypass ang restriction ng AJAX/Fetch sa GitHub -->
-    <form id="transmittalForm" action="" method="GET" target="_blank">
-      <div class="meta-section">
-        <div class="form-group"><label>PO NUMBER:</label><input type="text" name="poNum" id="poNum" placeholder="PO#"></div>
-        <div class="form-group"><label>DATE (Transmittal Created):</label><input type="date" name="dateField" id="dateField"></div>
-        <div class="form-group"><label>FROM:</label><input type="text" name="fromField" id="fromField" placeholder="FROM"></div>
-        <div class="form-group"><label>TO:</label><input type="text" name="toField" id="toField" placeholder="TO"></div>
-        <div class="form-group"><label>C/O:</label><input type="text" name="coField" id="coField" placeholder="C/O"></div>
-        <div class="form-group"><label>PREPARED BY:</label>
-          <select name="preparedBy" id="preparedBy" required>
-            <option value="" selected disabled>-- SELECT NAME --</option>
-            <option value="JM EDP MEYCAUYAN">JM EDP MEYCAUYAN</option>
-            <option value="RAFFY EDP MEYCAUYAN">RAFFY EDP MEYCAUYAN</option>
-          </select>
-        </div>
+    <div class="meta-section">
+      <div class="form-group"><label>PO NUMBER:</label><input type="text" id="poNum" placeholder="PO#"></div>
+      <div class="form-group"><label>DATE (Transmittal Created):</label><input type="date" id="dateField"></div>
+      <div class="form-group"><label>FROM:</label><input type="text" id="fromField" placeholder="FROM"></div>
+      <div class="form-group"><label>TO:</label><input type="text" id="toField" placeholder="TO"></div>
+      <div class="form-group"><label>C/O:</label><input type="text" id="coField" placeholder="C/O"></div>
+      <div class="form-group"><label>PREPARED BY:</label>
+        <select id="preparedBy" required>
+          <option value="" selected disabled>-- SELECT NAME --</option>
+          <option value="JM EDP MEYCAUYAN">JM EDP MEYCAUYAN</option>
+          <option value="RAFFY EDP MEYCAUYAN">RAFFY EDP MEYCAUYAN</option>
+        </select>
       </div>
+    </div>
 
-      <!-- Hidden field para itago ang listahan ng items -->
-      <input type="hidden" name="itemsJson" id="itemsJson">
-
-      <div class="item-title">📋 LISTAHAN NG MGA ITEMS / GAMIT</div>
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 20%;">USER</th>
-            <th style="width: 10%;">QTY</th>
-            <th style="width: 35%;">ITEM NAME (Type or Use Picker) *</th>
-            <th style="width: 17%;">SERIAL</th>
-            <th style="width: 13%;">REMARKS</th>
-            <th style="width: 5%;"></th>
-          </tr>
-        </thead>
-        <tbody id="itemsContainer">
-          <tr class="item-row" id="defaultRow">
-            <td><input type="text" class="input-user" placeholder="User"></td>
-            <td><input type="number" class="input-qty" value="1" min="1"></td>
-            <td>
-              <div class="item-field-container">
-                <input type="text" class="input-item" placeholder="Type here...">
-                <select onchange="pickItem(this)">
-                  <option value="" selected disabled>📋 Picker</option>
-                  <option value="System Unit (SERVER i3)">System Unit (SERVER i3)</option>
-                  <option value="Computer Set (System unit (Station), Monitor, Keyboard & Mouse, Avr)">Computer Set</option>
-                  <option value="System Unit (Station)">System Unit (Station)</option>
-                  <option value="Monitor">Monitor</option>
-                  <option value="UPS (APC)">UPS (APC)</option>
-                  <option value="Webcam Inplay">Webcam Inplay</option>
-                  <option value="Switch Hub Tplink 8 Ports">Switch Hub Tplink 8 Ports</option>
-                  <option value="Printer Epson L21">Printer Epson L21</option>
-                </select>
-              </div>
-            </td>
-            <td><input type="text" class="input-serial" placeholder="Serial No."></td>
-            <td><input type="text" class="input-remarks" placeholder="Remarks"></td>
-            <td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <button type="button" class="btn-add" onclick="addNewRow()">➕ ADD ROW</button>
-      <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
-    </form>
+    <div class="item-title">📋 LISTAHAN NG MGA ITEMS / GAMIT</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 20%;">USER</th>
+          <th style="width: 10%;">QTY</th>
+          <th style="width: 35%;">ITEM NAME (Type or Use Picker) *</th>
+          <th style="width: 17%;">SERIAL</th>
+          <th style="width: 13%;">REMARKS</th>
+          <th style="width: 5%;"></th>
+        </tr>
+      </thead>
+      <tbody id="itemsContainer">
+        <tr class="item-row" id="defaultRow">
+          <td><input type="text" class="input-user" placeholder="User"></td>
+          <td><input type="number" class="input-qty" value="1" min="1"></td>
+          <td>
+            <div class="item-field-container">
+              <input type="text" class="input-item" placeholder="Type here...">
+              <select onchange="pickItem(this)">
+                <option value="" selected disabled>📋 Picker</option>
+                <option value="System Unit (SERVER i3)">System Unit (SERVER i3)</option>
+                <option value="Computer Set (System unit (Station), Monitor, Keyboard & Mouse, Avr)">Computer Set</option>
+                <option value="System Unit (Station)">System Unit (Station)</option>
+                <option value="Monitor">Monitor</option>
+                <option value="UPS (APC)">UPS (APC)</option>
+                <option value="Webcam Inplay">Webcam Inplay</option>
+                <option value="Switch Hub Tplink 8 Ports">Switch Hub Tplink 8 Ports</option>
+                <option value="Printer Epson L21">Printer Epson L21</option>
+              </select>
+            </div>
+          </td>
+          <td><input type="text" class="input-serial" placeholder="Serial No."></td>
+          <td><input type="text" class="input-remarks" placeholder="Remarks"></td>
+          <td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <button type="button" class="btn-add" onclick="addNewRow()">➕ ADD ROW</button>
+    <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
     
     <div id="result"></div>
 
     <script>
       // ⚠️ IMPORTANT: I-PASTE DITO ANG CURRENT WEB APP URL NA GALING SA IYONG APPS SCRIPT DEPLOYMENT
-      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx20-OXayi9B6ydghD21q52hIPKgDLXFKYaZZix-DjiwqkmuIydBNyLk1Z45TFNXzue/exec";
+      const APPS_SCRIPT_URL = "https://google.com";
 
       function pickItem(selectObj) {
         if (selectObj.value) {
@@ -140,7 +139,7 @@
       }
 
       function submitForm() {
-        var form = document.getElementById("transmittalForm");
+        var btn = document.getElementById("btnSubmit");
         var resultDiv = document.getElementById("result");
         var preparedByVal = document.getElementById("preparedBy").value;
 
@@ -167,18 +166,17 @@
           }
         });
 
-        // I-encode ang talahanayan sa hidden element bago i-submit
-        document.getElementById("itemsJson").value = JSON.stringify(itemsData);
-
-        // Awtomatikong buksan ang Google Script Tab para doon i-process ang document creation nang walang CORS error
-        form.action = APPS_SCRIPT_URL;
-        form.submit();
-
+        // Baguhin ang status ng button at lagyan ng iyong orihinal na loading indicator text
+        btn.disabled = true;
+        btn.innerHTML = "⏳ NAGPAPROSESO...";
         resultDiv.style.display = "block";
-        resultDiv.style.backgroundColor = "#d4edda";
-        resultDiv.style.color = "#155724";
+        resultDiv.style.backgroundColor = "#fff3cd";
+        resultDiv.style.color = "#856404";
         resultDiv.innerHTML = "⏳ Ipinapadala ang transmittal data... Nagbubukas ng bagong window para sa Google Docs Link.";
-      }
-    </script>
-  </body>
-</html>
+
+        // Pag-setup ng data payload para sa URL parameters
+        var queryParams = new URLSearchParams({
+          poNum: document.getElementById("poNum").value,
+          dateField: document.getElementById("dateField").value,
+          fromField: document.getElementById("fromField").value,
+          toField: document.getElementById("toField").value,
