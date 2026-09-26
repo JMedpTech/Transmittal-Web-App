@@ -1,179 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LRCI Transmittal Portal</title>
+    <title>LRCI Transmittal Web App</title>
     <style>
       body { font-family: Arial, sans-serif; padding: 25px; background-color: #121212; color: #e0e0e0; max-width: 950px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border-radius: 8px; margin-top: 30px; background: #1a1a1a; }
       h3 { color: #ffcc00; border-bottom: 2px solid #ffcc00; padding-bottom: 8px; margin-top: 0; text-align: center; }
       .meta-section { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: #262626; padding: 15px; border-radius: 6px; border: 1px solid #333; }
       .form-group { margin-bottom: 12px; }
       label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #ffcc00; }
-      input[type="text"], input[type="date"], input[type="number"], select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #444; border-radius: 4px; font-size: 13px; background-color: #2b2b2b; color: #ffffff; }
-      input:focus, select:focus { border-color: #ffcc00; outline: none; box-shadow: 0 0 0 3px rgba(255,204,0,0.2); }
+      input[type="text"], input[type="date"], input[type="number"] { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #444; border-radius: 4px; font-size: 13px; background-color: #2b2b2b; color: #ffffff; }
+      input:focus { border-color: #ffcc00; outline: none; box-shadow: 0 0 0 3px rgba(255,204,0,0.2); }
       table { width: 100%; border-collapse: collapse; margin-top: 10px; }
       th { background-color: #ffcc00; color: #121212; padding: 10px; font-size: 12px; border: 1px solid #ffcc00; }
       td { padding: 6px; border: 1px solid #333; background-color: #222; }
       .item-title { margin-top: 20px; margin-bottom: 8px; color: #ffcc00; font-weight: bold; font-size: 14px; border-left: 4px solid #ffcc00; padding-left: 8px; }
-      .item-field-container { display: flex; gap: 4px; align-items: center; }
-      .item-field-container input { flex: 1; }
-      .item-field-container select { width: 110px; font-size: 11px; padding: 7px 4px; background: #333; border-color: #444; cursor: pointer; color: #ffcc00; font-weight: 600; }
-      .btn-add { background-color: #ffcc00; color: #121212; border: none; padding: 10px 20px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 15px; }
-      .btn-add:hover { background-color: #e6b800; }
+      .btn-add { background-color: #444; color: #ffcc00; border: 1px solid #ffcc00; padding: 8px 15px; font-size: 13px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+      .btn-add:hover { background-color: #ffcc00; color: #121212; }
       .btn-submit { width: 100%; background-color: #ffcc00; color: #121212; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 25px; }
       .btn-submit:hover { background-color: #e6b800; }
-      
-      /* Result Styles */
-      #result { margin-top: 20px; padding: 20px; border-radius: 6px; display: none; text-align: center; font-weight: bold; font-size: 16px; }
-      .success-link { background-color: #24292e; color: #ffcc00; padding: 14px 20px; display: inline-block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 15px; font-size: 15px; border: 2px solid #ffcc00; transition: 0.3s; }
-      .success-link:hover { background-color: #ffcc00; color: #121212; }
-      
-      .btn-delete { background-color: #e53e3e; color: white; border: none; padding: 6px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; display: block; margin: 0 auto; }
-      .btn-delete:hover { background-color: #c53030; }
+      .btn-submit:disabled { background-color: #555; color: #888; cursor: not-allowed; }
+      #status { text-align: center; margin-top: 15px; font-weight: bold; font-size: 14px; }
+      .success-link { color: #00ffcc; text-decoration: underline; font-size: 16px; }
     </style>
   </head>
   <body>
-    <h3>LRCI – MEYCAUYAN BRANCH (EDP)</h3>
-    <div style="text-align: center; color: #aaa; margin-top: -5px; margin-bottom: 20px; font-size: 14px; letter-spacing: 1px;">Transmittal Portal</div>
+
+    <h3>LRCI TRANSMITTAL WEB APP (GITHUB EDITION)</h3>
     
-    <!-- Itinutok ang target sa invisible iframe para HINDI magbukas ng bagong tab o mag-refresh ang screen -->
-    <form id="transmittalForm" action="" method="GET" target="hidden_iframe">
+    <form id="transmittalForm" onsubmit="submitForm(event)">
       <div class="meta-section">
-        <div class="form-group"><label>PO NUMBER:</label><input type="text" name="poNum" id="poNum" placeholder="PO#"></div>
-        <div class="form-group"><label>DATE (Transmittal Created):</label><input type="date" name="dateField" id="dateField"></div>
-        <div class="form-group"><label>FROM:</label><input type="text" name="fromField" id="fromField" placeholder="FROM"></div>
-        <div class="form-group"><label>TO:</label><input type="text" name="toField" id="toField" placeholder="TO"></div>
-        <div class="form-group"><label>C/O:</label><input type="text" name="coField" id="coField" placeholder="C/O"></div>
-        <div class="form-group"><label>PREPARED BY:</label>
-          <select name="preparedBy" id="preparedBy" required>
-            <option value="" selected disabled>-- SELECT NAME --</option>
-            <option value="JM EDP MEYCAUYAN">JM EDP MEYCAUYAN</option>
-            <option value="RAFFY EDP MEYCAUYAN">RAFFY EDP MEYCAUYAN</option>
-          </select>
-        </div>
+        <div class="form-group"><label>PO NUMBER</label><input type="text" id="poNum" required placeholder="Gaya ng PO-2026-001"></div>
+        <div class="form-group"><label>DATE</label><input type="date" id="dateField" required></div>
+        <div class="form-group"><label>FROM</label><input type="text" id="fromField" required placeholder="EDP Dept"></div>
+        <div class="form-group"><label>TO</label><input type="text" id="toField" required placeholder="Accounting / Branch Name"></div>
+        <div class="form-group"><label>C/O (CARE OF)</label><input type="text" id="coField" placeholder="Pangalan ng magdadala"></div>
+        <div class="form-group"><label>PREPARED BY</label><input type="text" id="preparedBy" required placeholder="Iyong Pangalan"></div>
       </div>
 
-      <input type="hidden" name="itemsJson" id="itemsJson">
-
-      <div class="item-title">📋 LISTAHAN NG MGA ITEMS / GAMIT</div>
-      <table>
+      <div class="item-title">TRANSMITTAL ITEMS</div>
+      <table id="itemsTable">
         <thead>
           <tr>
-            <th style="width: 20%;">USER</th>
-            <th style="width: 10%;">QTY</th>
-            <th style="width: 35%;">ITEM NAME (Type or Use Picker) *</th>
-            <th style="width: 17%;">SERIAL</th>
-            <th style="width: 13%;">REMARKS</th>
-            <th style="width: 5%;"></th>
+            <th>USER</th>
+            <th style="width: 70px;">QTY</th>
+            <th>ITEM</th>
+            <th>SERIAL</th>
+            <th>REMARKS</th>
           </tr>
         </thead>
-        <tbody id="itemsContainer">
-          <tr class="item-row" id="defaultRow">
-            <td><input type="text" class="input-user" placeholder="User"></td>
-            <td><input type="number" class="input-qty" value="1" min="1"></td>
-            <td>
-              <div class="item-field-container">
-                <input type="text" class="input-item" placeholder="Type here...">
-                <select onchange="pickItem(this)">
-                  <option value="" selected disabled>📋 Picker</option>
-                  <option value="System Unit (SERVER i3)">System Unit (SERVER i3)</option>
-                  <option value="Computer Set (System unit (Station), Monitor, Keyboard & Mouse, Avr)">Computer Set</option>
-                  <option value="System Unit (Station)">System Unit (Station)</option>
-                  <option value="Monitor">Monitor</option>
-                  <option value="UPS (APC)">UPS (APC)</option>
-                  <option value="Webcam Inplay">Webcam Inplay</option>
-                  <option value="Switch Hub Tplink 8 Ports">Switch Hub Tplink 8 Ports</option>
-                  <option value="Printer Epson L21">Printer Epson L21</option>
-                </select>
-              </div>
-            </td>
-            <td><input type="text" class="input-serial" placeholder="Serial No."></td>
-            <td><input type="text" class="input-remarks" placeholder="Remarks"></td>
-            <td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>
+        <tbody id="tableBody">
+          <tr>
+            <td><input type="text" class="row-user"></td>
+            <td><input type="number" class="row-qty" min="1" value="1"></td>
+            <td><input type="text" class="row-item"></td>
+            <td><input type="text" class="row-serial"></td>
+            <td><input type="text" class="row-remarks"></td>
           </tr>
         </tbody>
       </table>
-      
-      <button type="button" class="btn-add" onclick="addNewRow()">➕ ADD ROW</button>
-      <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
-    </form>
-    
-    <div id="result"></div>
 
-    <!-- Invisible Iframe: Dito papasok nang tahimik ang request nang walang ibang tab na bumubukas -->
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+      <button type="button" class="btn-add" onclick="addRow()">+ MAGDAGDAG NG ROW</button>
+      <button type="submit" id="submitBtn" class="btn-submit">IPROSESO AT GAWIN ANG TRANSMITTAL</button>
+    </form>
+
+    <div id="status"></div>
 
     <script>
-      // ⚠️ IMPORTANT: I-PASTE DITO ANG IYONG APPS SCRIPT WEB APP URL
-      const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWNyfIFfFCx4z8QJsSwecXNfaSI2gjUKGu6PXgpsJVpdEQ0sEsEolkT9Y5EiZiPmIM/exec";
+      // PALITAN MO ITO NG IYONG GOOGLE APPS SCRIPT WEB APP URL MATAPOS MAG DEPLOY
+      const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwptAnL-vnBd0w3AmzC1bZHlA9TESgE80tPuOYa8KMvw9NJHqsX1ULXdtDsDv3Miqk8/exec";
 
-      function pickItem(selectObj) {
-        if (selectObj.value) {
-          var container = selectObj.closest(".item-field-container") || selectObj.parentElement;
-          container.querySelector(".input-item").value = selectObj.value;
-          selectObj.value = ""; 
-        }
+      function addRow() {
+        var tbody = document.getElementById("tableBody");
+        var tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><input type="text" class="row-user"></td>
+          <td><input type="number" class="row-qty" min="1" value="1"></td>
+          <td><input type="text" class="row-item"></td>
+          <td><input type="text" class="row-serial"></td>
+          <td><input type="text" class="row-remarks"></td>
+        `;
+        tbody.appendChild(tr);
       }
 
-      function addNewRow() {
-        var tbody = document.getElementById("itemsContainer");
-        var baseRow = document.getElementById("defaultRow");
-        if (!baseRow) return;
+      function submitForm(event) {
+        event.preventDefault();
         
-        var clone = baseRow.cloneNode(true);
-        clone.removeAttribute("id");
+        var submitBtn = document.getElementById("submitBtn");
+        var statusDiv = document.getElementById("status");
         
-        var inputs = clone.querySelectorAll("input");
-        inputs.forEach(function(input) {
-          if (input.classList.contains("input-qty")) {
-            input.value = "1";
-          } else {
-            input.value = "";
-          }
-        });
-        tbody.appendChild(clone);
-      }
+        submitBtn.disabled = true;
+        statusDiv.style.color = "#ffcc00";
+        statusDiv.innerHTML = "Kinokolekta ang data at ginagawa ang Google Doc... Sandali lamang.";
 
-      function deleteRow(button) {
-        var row = button.closest("tr") || button.parentNode.parentNode;
-        var tbody = document.getElementById("itemsContainer");
-        if (tbody.rows.length > 1) {
-          tbody.removeChild(row);
-        } else {
-          var inputs = row.querySelectorAll("input");
-          inputs.forEach(function(input) { input.value = ""; });
-        }
-      }
-
-      function submitForm() {
-        var form = document.getElementById("transmittalForm");
-        var btn = document.getElementById("btnSubmit");
-        var resultDiv = document.getElementById("result");
-        var preparedByVal = document.getElementById("preparedBy").value;
-
-        if (!preparedByVal) {
-          resultDiv.style.display = "block";
-          resultDiv.style.backgroundColor = "#ffdbdb";
-          resultDiv.style.color = "#c53030";
-          resultDiv.innerHTML = "⚠️ Mangyaring pumili muna ng pangalan sa PREPARED BY.";
-          return;
-        }
+        var itemsList = [];
+        var rows = document.querySelectorAll("#tableBody tr");
         
-        var itemsData = [];
-        var rows = document.querySelectorAll(".item-row");
         rows.forEach(function(row) {
-          var itemVal = row.querySelector(".input-item").value;
-          if (itemVal && itemVal.trim() !== "") {
-            itemsData.push({
-              user: row.querySelector(".input-user").value || "",
-              qty: row.querySelector(".input-qty").value || "1",
-              item: itemVal.trim(),
-              serial: row.querySelector(".input-serial").value || "",
-              remarks: row.querySelector(".input-remarks").value || ""
+          var itemVal = row.querySelector(".row-item").value;
+          if(itemVal && itemVal.trim() !== "") {
+            itemsList.push({
+              user: row.querySelector(".row-user").value,
+              qty: row.querySelector(".row-qty").value,
+              item: itemVal,
+              serial: row.querySelector(".row-serial").value,
+              remarks: row.querySelector(".row-remarks").value
             });
           }
         });
 
-        document.getElementById("itemsJson").value = JSON.stringify(itemsData);
+        var formData = {
+          poNum: document.getElementById("poNum").value,
+          dateField: document.getElementById("dateField").value,
+          fromField: document.getElementById("fromField").value,
+          toField: document.getElementById("toField").value,
+          coField: document.getElementById("coField").value,
+          preparedBy: document.getElementById("preparedBy").value,
+          itemsJson: JSON.stringify(itemsList)
+        };
 
+        // Gagamit ng Fetch API para ipadala ang data papunta sa Google Apps Script cross-domain
+        fetch(GAS_WEB_APP_URL, {
+          method: "POST",
+          mode: "no-cors", // Kailangan ng no-cors para sa Google Redirects redirect mechanism
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
+        })
+        .then(response => {
+          // Dahil no-cors ang mode, hindi natin mababasa ang direktang json response 
+          // para sa URL para sa seguridad, ngunit alam nating gumana ito kung walang network crash.
+          submitBtn.disabled = false;
+          statusDiv.style.color = "#00ffcc";
+          statusDiv.innerHTML = `<b>Tagumpay!</b> Naipadala ang data. Pakisuri ang iyong Google Drive para sa bagong gawang file ("Transmittal - PO ${formData.poNum}").`;
+          document.getElementById("transmittalForm").reset();
+          document.getElementById("tableBody").innerHTML = `
+            <tr>
+              <td><input type="text" class="row-user"></td>
+              <td><input type="number" class="row-qty" min="1" value="1"></td>
+              <td><input type="text" class="row-item"></td>
+              <td><input type="text" class="row-serial"></td>
+              <td><input type="text" class="row-remarks"></td>
+            </tr>
+          `;
+        })
+        .catch(error => {
+          submitBtn.disabled = false;
+          statusDiv.style.color = "#ff3333";
+          statusDiv.innerHTML = "May naganap na error sa pagpapadala: " + error.message;
+        });
+      }
+    </script>
+  </body>
+</html>
