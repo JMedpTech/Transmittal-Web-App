@@ -77,120 +77,120 @@
   <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
   <div id="result"></div>
 
-<script>
-  // ⚠️ PALITAN ITO NG IYONG LIVE GOOGLE APPS SCRIPT WEB APP URL
-  const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby3SL4YFE2lgWe6dSvZYQTLb-sTQ8P3Zx9ned7d_hgms6rtKN7v0z0GPT5pgptBOCV0/exec";
+    <script>
+      // ⚠️ I-PASTE MO DITO ANG IYONG GOOGLE APPS SCRIPT WEB APP URL (Yung nagtatapos sa /exec)
+      const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby3SL4YFE2lgWe6dSvZYQTLb-sTQ8P3Zx9ned7d_hgms6rtKN7v0z0GPT5pgptBOCV0/exec";
 
-  function pickItem(s) {
-    if (s.value) {
-      s.parentElement.querySelector(".input-item").value = s.value;
-      s.value = ""; 
-    }
-  }
+      function pickItem(selectObj) {
+        if (selectObj.value) {
+          selectObj.parentElement.querySelector(".input-item").value = selectObj.value;
+          selectObj.value = ""; 
+        }
+      }
 
-  function addNewRow() {
-    var tbody = document.getElementById("itemsContainer");
-    var tr = document.createElement("tr"); 
-    tr.className = "item-row";
-    tr.innerHTML = '<td><input type="text" class="input-user" placeholder="User"></td><td><input type="number" class="input-qty" min="1" value="1"></td><td><div class="item-field-container"><input type="text" class="input-item" placeholder="Type here..."><select onchange="pickItem(this)"><option value="" selected disabled>📋 Picker</option><option value="System Unit (SERVER i3)">System Unit</option><option value="Computer Set">Computer Set</option><option value="Monitor">Monitor</option><option value="UPS (APC)">UPS (APC)</option></select></div></td><td><input type="text" class="input-serial" placeholder="Serial"></td><td><input type="text" class="input-remarks" placeholder="Remarks"></td><td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>';
-    tbody.appendChild(tr);
-  }
+      function addNewRow() {
+        var tbody = document.getElementById("itemsContainer");
+        var baseRow = document.getElementById("defaultRow");
+        var clone = baseRow.cloneNode(true);
+        clone.removeAttribute("id");
+        
+        var inputs = clone.querySelectorAll("input");
+        inputs.forEach(function(input) {
+          input.value = "";
+        });
+        
+        tbody.appendChild(clone);
+      }
 
-  function deleteRow(b) {
-    var tbody = document.getElementById("itemsContainer");
-    if (tbody.querySelectorAll(".item-row").length > 1) { 
-      tbody.removeChild(b.closest(".item-row")); 
-    }
-  }
+      function deleteRow(button) {
+        var row = button.parentNode.parentNode;
+        var tbody = document.getElementById("itemsContainer");
+        
+        if (tbody.rows.length > 1) {
+          tbody.removeChild(row);
+        } else {
+          var inputs = row.querySelectorAll("input");
+          inputs.forEach(function(input) {
+            input.value = "";
+          });
+        }
+      }
 
-  function submitForm() {
-    var btn = document.getElementById("btnSubmit"); 
-    var resultDiv = document.getElementById("result");
-    var prep = document.getElementById("preparedBy").value;
-    
-    if (!prep) { 
-      resultDiv.style.display = "block"; 
-      resultDiv.style.backgroundColor = "#ffdbdb"; 
-      resultDiv.style.color = "#c53030"; 
-      resultDiv.innerHTML = "⚠️ Mangyaring pumili muna ng pangalan sa PREPARED BY."; 
-      return; 
-    }
-    
-    var itemsData = [];
-    document.querySelectorAll(".item-row").forEach(function(row) {
-      var itemVal = row.querySelector(".input-item").value;
-      if (itemVal && itemVal.trim() !== "") {
-        itemsData.push({
-          user: row.querySelector(".input-user").value || "",
-          qty: row.querySelector(".input-qty").value || "1",
-          item: itemVal.trim(),
-          serial: row.querySelector(".input-serial").value || "",
-          remarks: row.querySelector(".input-remarks").value || ""
+      function submitForm() {
+        var btn = document.getElementById("btnSubmit");
+        var resultDiv = document.getElementById("result");
+        var preparedByVal = document.getElementById("preparedBy").value;
+
+        if (!preparedByVal) {
+          resultDiv.style.display = "block";
+          resultDiv.style.backgroundColor = "#ffdbdb";
+          resultDiv.style.color = "#c53030";
+          resultDiv.innerHTML = "⚠️ Mangyaring pumili muna ng pangalan sa PREPARED BY.";
+          return;
+        }
+        
+        var itemsData = [];
+        var rows = document.querySelectorAll(".item-row");
+        rows.forEach(function(row) {
+          var itemVal = row.querySelector(".input-item").value;
+          if (itemVal && itemVal.trim() !== "") {
+            itemsData.push({
+              user: row.querySelector(".input-user").value || "",
+              qty: row.querySelector(".input-qty").value || "1",
+              item: itemVal.trim(),
+              serial: row.querySelector(".input-serial").value || "",
+              remarks: row.querySelector(".input-remarks").value || ""
+            });
+          }
+        });
+        
+        btn.disabled = true;
+        btn.style.backgroundColor = "#555555";
+        btn.style.color = "#888888";
+        resultDiv.style.display = "block";
+        resultDiv.style.backgroundColor = "#fff3cd";
+        resultDiv.style.color = "#856404";
+        resultDiv.innerHTML = "⏳ Ginagawa ang Transmittal Form... Pakihintay...";
+        
+        var formData = {
+          poNum: document.getElementById("poNum").value,
+          fromField: document.getElementById("fromField").value,
+          toField: document.getElementById("toField").value,
+          coField: document.getElementById("coField").value,
+          dateField: document.getElementById("dateField").value,
+          preparedBy: preparedByVal,
+          itemsJson: JSON.stringify(itemsData)
+        };
+
+        // Binago gamit ang Fetch API para gumana mula sa labas/GitHub nang hindi nasisira ang inyong success handler logic
+        fetch(GAS_WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: { "Content-Type": "text/plain;charset=utf-8" }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.status === "success" && data.url) {
+            btn.disabled = false;
+            btn.style.backgroundColor = "#ffcc00";
+            btn.style.color = "#121212";
+            resultDiv.style.backgroundColor = "#d4edda";
+            resultDiv.style.color = "#155724";
+            resultDiv.innerHTML = '🎉 Tagumpay! Nalikha ang iyong Transmittal.<br><a class="success-link" href="' + data.url + '" target="_blank">📄 BUKSAN ANG TRANSMITTAL DOCUMENT</a>';
+          } else {
+            throw new Error(data.message || "Hindi maibalik ang transmittal download URL.");
+          }
+        })
+        .catch(function(err) {
+          btn.disabled = false;
+          btn.style.backgroundColor = "#ffcc00";
+          btn.style.color = "#121212";
+          resultDiv.style.backgroundColor = "#f8d7da";
+          resultDiv.style.color = "#721c24";
+          resultDiv.innerHTML = "❌ Nagka-error: " + err.message;
         });
       }
-    });
-
-    var formData = { 
-      poNum: document.getElementById("poNum").value || "Blangko", 
-      dateField: document.getElementById("dateField").value, 
-      fromField: document.getElementById("fromField").value, 
-      toField: document.getElementById("toField").value, 
-      coField: document.getElementById("coField").value, 
-      preparedBy: prep, 
-      itemsJson: JSON.stringify(itemsData) 
-    };
-
-    resultDiv.style.display = "block"; 
-    resultDiv.style.backgroundColor = "#262626"; 
-    resultDiv.style.color = "#ffcc00"; 
-    resultDiv.innerHTML = "⏳ Ipinoproseso at nagrerehistro... Lalabas ang link sa ibaba sandali lamang.";
-
-    // LIGTAS NA PARAAN: Gumawa ng pansamantalang form para maiwasan ang CORS Fetch error
-    var form = document.createElement("form");
-    form.method = "POST";
-    form.action = GAS_WEB_APP_URL;
-    form.target = "transmittal_frame"; // I-target sa nakatagong iframe para hindi mag-refresh ang page
-
-    var input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "payload";
-    input.value = JSON.stringify(formData);
-    form.appendChild(input);
-
-    // Gumawa ng pansamantalang iframe para saluhin ang response (ang URL ng doc)
-    var iframe = document.createElement("iframe");
-    iframe.name = "transmittal_frame";
-    iframe.style.display = "none";
-    document.body.appendChild(iframe);
-    document.body.appendChild(form);
-
-    form.submit();
-
-    // Linisin ang mga temporary elements matapos ma-submit
-    setTimeout(function() {
-      document.body.removeChild(form);
-    }, 500);
-
-    // Makinig sa sagot na galing sa Google Script para ipakita ang link
-    window.addEventListener("message", function receiveLink(event) {
-      if (event.data && event.data.type === "TRANSMITTAL_URL") {
-        btn.disabled = false;
-        resultDiv.style.backgroundColor = "#1a2e1a"; 
-        resultDiv.style.color = "#ffffff";
-        
-        // Eksaktong disenyo na hinihingi mo:
-        resultDiv.innerHTML = `
-          <div style="font-size: 16px; margin-bottom: 12px;">🎉 Tagumpay! Nalikha ang iyong Transmittal.</div>
-          <a class="success-link" href="${event.data.url}" target="_blank">📄 BUKSAN ANG TRANSMITTAL DOCUMENT</a>
-        `;
-        
-        // Alisin ang listener para sa susunod na transaksyon
-        window.removeEventListener("message", receiveLink);
-        document.body.removeChild(iframe);
-      }
-    }, false);
-  }
-</script>
+    </script>
 
 
 </body>
