@@ -77,27 +77,44 @@
   <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
   <div id="result"></div>
 
- <script>
+<script>
+  // ⚠️ PALITAN ITO NG IYONG LIVE GOOGLE APPS SCRIPT WEB APP URL
   const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby3SL4YFE2lgWe6dSvZYQTLb-sTQ8P3Zx9ned7d_hgms6rtKN7v0z0GPT5pgptBOCV0/exec";
 
-  function pickItem(s){if(s.value){s.parentElement.querySelector(".input-item").value=s.value;s.value="";}}
-  
-  function addNewRow(){
+  function pickItem(s) {
+    if (s.value) {
+      s.parentElement.querySelector(".input-item").value = s.value;
+      s.value = ""; 
+    }
+  }
+
+  function addNewRow() {
     var tbody = document.getElementById("itemsContainer");
-    var tr = document.createElement("tr"); tr.className = "item-row";
+    var tr = document.createElement("tr"); 
+    tr.className = "item-row";
     tr.innerHTML = '<td><input type="text" class="input-user" placeholder="User"></td><td><input type="number" class="input-qty" min="1" value="1"></td><td><div class="item-field-container"><input type="text" class="input-item" placeholder="Type here..."><select onchange="pickItem(this)"><option value="" selected disabled>📋 Picker</option><option value="System Unit (SERVER i3)">System Unit</option><option value="Computer Set">Computer Set</option><option value="Monitor">Monitor</option><option value="UPS (APC)">UPS (APC)</option></select></div></td><td><input type="text" class="input-serial" placeholder="Serial"></td><td><input type="text" class="input-remarks" placeholder="Remarks"></td><td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>';
     tbody.appendChild(tr);
   }
-  
-  function deleteRow(b){
+
+  function deleteRow(b) {
     var tbody = document.getElementById("itemsContainer");
-    if(tbody.querySelectorAll(".item-row").length > 1){ tbody.removeChild(b.closest(".item-row")); }
+    if (tbody.querySelectorAll(".item-row").length > 1) { 
+      tbody.removeChild(b.closest(".item-row")); 
+    }
   }
-  
+
   function submitForm() {
-    var btn = document.getElementById("btnSubmit"); var resultDiv = document.getElementById("result");
+    var btn = document.getElementById("btnSubmit"); 
+    var resultDiv = document.getElementById("result");
     var prep = document.getElementById("preparedBy").value;
-    if (!prep) { resultDiv.style.display = "block"; resultDiv.style.backgroundColor = "#ffdbdb"; resultDiv.style.color = "#c53030"; resultDiv.innerHTML = "⚠️ Pumili sa PREPARED BY."; return; }
+    
+    if (!prep) { 
+      resultDiv.style.display = "block"; 
+      resultDiv.style.backgroundColor = "#ffdbdb"; 
+      resultDiv.style.color = "#c53030"; 
+      resultDiv.innerHTML = "⚠️ Mangyaring pumili muna ng pangalan sa PREPARED BY."; 
+      return; 
+    }
     
     var itemsData = [];
     document.querySelectorAll(".item-row").forEach(function(row) {
@@ -112,29 +129,69 @@
         });
       }
     });
-    
-    var formData = { poNum: document.getElementById("poNum").value, dateField: document.getElementById("dateField").value, fromField: document.getElementById("fromField").value, toField: document.getElementById("toField").value, coField: document.getElementById("coField").value, preparedBy: prep, itemsJson: JSON.stringify(itemsData) };
-    
-    btn.disabled = true; resultDiv.style.display = "block"; resultDiv.style.backgroundColor = "#262626"; resultDiv.style.color = "#ffcc00"; resultDiv.innerHTML = "⏳ Ipinoproseso... Tingnan ang iyong Google Drive matapos nito.";
-    
-    // Inayos gamit ang 'no-cors' para lampasan ang Failed to Fetch error
-    fetch(GAS_WEB_APP_URL, { 
-      method: "POST", 
-      body: JSON.stringify(formData), 
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" } 
-    })
-    .then(() => {
-      btn.disabled = false;
-      resultDiv.style.backgroundColor = "#1a2e1a"; resultDiv.style.color = "#ffffff";
-      // Dahil naka 'no-cors', hindi pwedeng ibalik ng Google ang link sa screen para sa security, pero tapos na at nalikha na ito sa iyong Google Drive!
-      resultDiv.innerHTML = '<div style="font-size: 16px; font-weight: bold;">🎉 Tagumpay! Nalikha ang iyong Transmittal.</div><div style="font-size:12px; color:#aaa; margin-top:5px;">Suriin ang iyong Google Drive para sa file na "Transmittal - PO ' + formData.poNum + '"</div>';
-    })
-    .catch(err => { 
-      btn.disabled = false; resultDiv.style.backgroundColor = "#ffdbdb"; resultDiv.style.color = "#c53030"; resultDiv.innerHTML = "❌ Error: " + err.message; 
-    });
+
+    var formData = { 
+      poNum: document.getElementById("poNum").value || "Blangko", 
+      dateField: document.getElementById("dateField").value, 
+      fromField: document.getElementById("fromField").value, 
+      toField: document.getElementById("toField").value, 
+      coField: document.getElementById("coField").value, 
+      preparedBy: prep, 
+      itemsJson: JSON.stringify(itemsData) 
+    };
+
+    resultDiv.style.display = "block"; 
+    resultDiv.style.backgroundColor = "#262626"; 
+    resultDiv.style.color = "#ffcc00"; 
+    resultDiv.innerHTML = "⏳ Ipinoproseso at nagrerehistro... Lalabas ang link sa ibaba sandali lamang.";
+
+    // LIGTAS NA PARAAN: Gumawa ng pansamantalang form para maiwasan ang CORS Fetch error
+    var form = document.createElement("form");
+    form.method = "POST";
+    form.action = GAS_WEB_APP_URL;
+    form.target = "transmittal_frame"; // I-target sa nakatagong iframe para hindi mag-refresh ang page
+
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "payload";
+    input.value = JSON.stringify(formData);
+    form.appendChild(input);
+
+    // Gumawa ng pansamantalang iframe para saluhin ang response (ang URL ng doc)
+    var iframe = document.createElement("iframe");
+    iframe.name = "transmittal_frame";
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+    document.body.appendChild(form);
+
+    form.submit();
+
+    // Linisin ang mga temporary elements matapos ma-submit
+    setTimeout(function() {
+      document.body.removeChild(form);
+    }, 500);
+
+    // Makinig sa sagot na galing sa Google Script para ipakita ang link
+    window.addEventListener("message", function receiveLink(event) {
+      if (event.data && event.data.type === "TRANSMITTAL_URL") {
+        btn.disabled = false;
+        resultDiv.style.backgroundColor = "#1a2e1a"; 
+        resultDiv.style.color = "#ffffff";
+        
+        // Eksaktong disenyo na hinihingi mo:
+        resultDiv.innerHTML = `
+          <div style="font-size: 16px; margin-bottom: 12px;">🎉 Tagumpay! Nalikha ang iyong Transmittal.</div>
+          <a class="success-link" href="${event.data.url}" target="_blank">📄 BUKSAN ANG TRANSMITTAL DOCUMENT</a>
+        `;
+        
+        // Alisin ang listener para sa susunod na transaksyon
+        window.removeEventListener("message", receiveLink);
+        document.body.removeChild(iframe);
+      }
+    }, false);
   }
 </script>
+
 
 </body>
 </html>
