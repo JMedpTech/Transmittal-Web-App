@@ -65,7 +65,7 @@
         </tr>
       </thead>
       <tbody id="itemsContainer">
-        <tr class="item-row" id="defaultRow">
+        <tr class="item-row">
           <td><input type="text" class="input-user" placeholder="User"></td>
           <td><input type="number" class="input-qty" placeholder="1" min="1" value="1"></td>
           <td>
@@ -97,7 +97,7 @@
     <div id="result"></div>
 
     <script>
-      // ⚠️ IPALIT ANG IYONG LIVE GOOGLE APPS SCRIPT WEB APP URL DITO (DAPAT NAGSISISIMULA SA https://google.com...)
+      // ⚠️ PALITAN MO ITO NG IYONG LIVE GOOGLE APPS SCRIPT WEB APP URL MATAPOS MAG DEPLOY BILANG ANYONE!
       const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwptAnL-vnBd0w3AmzC1bZHlA9TESgE80tPuOYa8KMvw9NJHqsX1ULXdtDsDv3Miqk8/exec";
 
       function pickItem(selectObj) {
@@ -107,21 +107,35 @@
         }
       }
 
+      // Safe add row nang hindi gumagamit ng cloneNode na may bug
       function addNewRow() {
         var tbody = document.getElementById("itemsContainer");
-        var baseRow = document.getElementById("defaultRow");
-        var clone = baseRow.cloneNode(true);
-        clone.removeAttribute("id");
-        
-        var inputs = clone.querySelectorAll("input");
-        inputs.forEach(function(input) {
-          if (input.classList.contains("input-qty")) {
-            input.value = "1";
-          } else {
-            input.value = "";
-          }
-        });
-        tbody.appendChild(clone);
+        var tr = document.createElement("tr");
+        tr.className = "item-row";
+        tr.innerHTML = `
+          <td><input type="text" class="input-user" placeholder="User"></td>
+          <td><input type="number" class="input-qty" placeholder="1" min="1" value="1"></td>
+          <td>
+            <div class="item-field-container">
+              <input type="text" class="input-item" placeholder="Type here...">
+              <select onchange="pickItem(this)">
+                <option value="" selected disabled>📋 Picker</option>
+                <option value="System Unit (SERVER i3)">System Unit (SERVER i3)</option>
+                <option value="Computer Set (System unit (Station), Monitor, Keyboard & Mouse, Avr)">Computer Set</option>
+                <option value="System Unit (Station)">System Unit (Station)</option>
+                <option value="Monitor">Monitor</option>
+                <option value="UPS (APC)">UPS (APC)</option>
+                <option value="Webcam Inplay">Webcam Inplay</option>
+                <option value="Switch Hub Tplink 8 Ports">Switch Hub Tplink 8 Ports</option>
+                <option value="Printer Epson L21">Printer Epson L21</option>
+              </select>
+            </div>
+          </td>
+          <td><input type="text" class="input-serial" placeholder="Serial No."></td>
+          <td><input type="text" class="input-remarks" placeholder="Remarks"></td>
+          <td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>
+        `;
+        tbody.appendChild(tr);
       }
 
       function deleteRow(button) {
@@ -158,29 +172,3 @@
         var itemsData = [];
         var rows = document.querySelectorAll(".item-row");
         rows.forEach(function(row) {
-          var itemVal = row.querySelector(".input-item").value;
-          if (itemVal && itemVal.trim() !== "") {
-            itemsData.push({
-              user: row.querySelector(".input-user").value || "",
-              qty: row.querySelector(".input-qty").value || "1",
-              item: itemVal.trim(),
-              serial: row.querySelector(".input-serial").value || "",
-              remarks: row.querySelector(".input-remarks").value || ""
-            });
-          }
-        });
-
-        var formData = {
-          poNum: document.getElementById("poNum").value || "",
-          dateField: document.getElementById("dateField").value || "",
-          fromField: document.getElementById("fromField").value || "",
-          toField: document.getElementById("toField").value || "",
-          coField: document.getElementById("coField").value || "",
-          preparedBy: preparedByVal,
-          itemsJson: JSON.stringify(itemsData)
-        };
-
-        btn.disabled = true;
-        resultDiv.style.display = "block";
-        resultDiv.style.backgroundColor = "#262626";
-        resultDiv.style.color = "#ffcc00";
