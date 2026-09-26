@@ -77,7 +77,7 @@
   <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">GUMAWA AT I-GENERATE ANG TRANSMITTAL</button>
   <div id="result"></div>
 
-    <script>
+        <script>
       // ⚠️ I-PASTE MO DITO ANG IYONG GOOGLE APPS SCRIPT WEB APP URL (Yung nagtatapos sa /exec)
       const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby2VvhPb-VJ1FhLn_4uu9DYoJmu2x_HAdhjliOLKkRML9QEijbpS7_xUwdWyafv3yg/exec";
 
@@ -88,30 +88,40 @@
         }
       }
 
+      // Ligtas na add row: Hindi na kailangan ng cloneNode o id="defaultRow" kaya hindi na mag-e-error!
       function addNewRow() {
         var tbody = document.getElementById("itemsContainer");
-        var baseRow = document.getElementById("defaultRow");
-        var clone = baseRow.cloneNode(true);
-        clone.removeAttribute("id");
-        
-        var inputs = clone.querySelectorAll("input");
-        inputs.forEach(function(input) {
-          input.value = "";
-        });
-        
-        tbody.appendChild(clone);
+        var tr = document.createElement("tr");
+        tr.className = "item-row";
+        tr.innerHTML = '<td><input type="text" class="input-user" placeholder="User"></td>' +
+                     '<td><input type="number" class="input-qty" placeholder="1" min="1" value="1"></td>' +
+                     '<td><div class="item-field-container">' +
+                     '<input type="text" class="input-item" placeholder="Type here...">' +
+                     '<select onchange="pickItem(this)">' +
+                     '<option value="" selected disabled>📋 Picker</option>' +
+                     '<option value="System Unit (SERVER i3)">System Unit (SERVER i3)</option>' +
+                     '<option value="Computer Set (System unit (Station), Monitor, Keyboard & Mouse, Avr)">Computer Set</option>' +
+                     '<option value="System Unit (Station)">System Unit (Station)</option>' +
+                     '<option value="Monitor">Monitor</option>' +
+                     '<option value="UPS (APC)">UPS (APC)</option>' +
+                     '<option value="Webcam Inplay">Webcam Inplay</option>' +
+                     '<option value="Switch Hub Tplink 8 Ports">Switch Hub Tplink 8 Ports</option>' +
+                     '<option value="Printer Epson L21">Printer Epson L21</option>' +
+                     '</select></div></td>' +
+                     '<td><input type="text" class="input-serial" placeholder="Serial No."></td>' +
+                     '<td><input type="text" class="input-remarks" placeholder="Remarks"></td>' +
+                     '<td><button type="button" class="btn-delete" onclick="deleteRow(this)">❌</button></td>';
+        tbody.appendChild(tr);
       }
 
       function deleteRow(button) {
-        var row = button.parentNode.parentNode;
         var tbody = document.getElementById("itemsContainer");
-        
-        if (tbody.rows.length > 1) {
-          tbody.removeChild(row);
+        if (tbody.querySelectorAll(".item-row").length > 1) {
+          tbody.removeChild(button.closest(".item-row"));
         } else {
-          var inputs = row.querySelectorAll("input");
+          var inputs = button.closest(".item-row").querySelectorAll("input");
           inputs.forEach(function(input) {
-            input.value = "";
+            input.value = input.classList.contains("input-qty") ? "1" : "";
           });
         }
       }
@@ -162,7 +172,6 @@
           itemsJson: JSON.stringify(itemsData)
         };
 
-        // Binago gamit ang Fetch API para gumana mula sa labas/GitHub nang hindi nasisira ang inyong success handler logic
         fetch(GAS_WEB_APP_URL, {
           method: "POST",
           body: JSON.stringify(formData),
@@ -170,10 +179,10 @@
         })
         .then(function(res) { return res.json(); })
         .then(function(data) {
+          btn.disabled = false;
+          btn.style.backgroundColor = "#ffcc00";
+          btn.style.color = "#121212";
           if (data.status === "success" && data.url) {
-            btn.disabled = false;
-            btn.style.backgroundColor = "#ffcc00";
-            btn.style.color = "#121212";
             resultDiv.style.backgroundColor = "#d4edda";
             resultDiv.style.color = "#155724";
             resultDiv.innerHTML = '🎉 Tagumpay! Nalikha ang iyong Transmittal.<br><a class="success-link" href="' + data.url + '" target="_blank">📄 BUKSAN ANG TRANSMITTAL DOCUMENT</a>';
