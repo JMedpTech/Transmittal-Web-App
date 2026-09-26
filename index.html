@@ -27,7 +27,7 @@
       .btn-submit:hover { background-color: #e6b800; }
       .btn-submit:disabled { background-color: #555; color: #888; cursor: not-allowed; }
       #result { margin-top: 20px; padding: 15px; border-radius: 4px; display: none; text-align: center; font-weight: bold; }
-      .success-link { background-color: #2f855a; color: white; padding: 12px; display: block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 10px; font-size: 14px; }
+      .success-link { background-color: #2f855a; color: white; padding: 12px; display: block; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 10px; font-size: 14px; text-transform: uppercase; }
       .success-link:hover { background-color: #276749; }
       .btn-delete { background-color: #e53e3e; color: white; border: none; padding: 6px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; display: block; margin: 0 auto; }
       .btn-delete:hover { background-color: #c53030; }
@@ -97,7 +97,7 @@
     <div id="result"></div>
 
     <script>
-      // ⚠️ PALITAN MO ITO NG IYONG LIVE GOOGLE APPS SCRIPT WEB APP URL MATAPOS MAG DEPLOY BILANG ANYONE!
+      // ⚠️ PALITAN ITO NG IYONG LIVE GOOGLE APPS SCRIPT WEB APP URL
       const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwptAnL-vnBd0w3AmzC1bZHlA9TESgE80tPuOYa8KMvw9NJHqsX1ULXdtDsDv3Miqk8/exec";
 
       function pickItem(selectObj) {
@@ -107,7 +107,6 @@
         }
       }
 
-      // Safe add row nang hindi gumagamit ng cloneNode na may bug
       function addNewRow() {
         var tbody = document.getElementById("itemsContainer");
         var tr = document.createElement("tr");
@@ -172,3 +171,6 @@
         var itemsData = [];
         var rows = document.querySelectorAll(".item-row");
         rows.forEach(function(row) {
+          var itemVal = row.querySelector(".input-item").value;
+          if (itemVal && itemVal.trim() !== "") {
+            itemsData.push({
